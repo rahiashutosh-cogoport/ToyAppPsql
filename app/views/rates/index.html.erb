@@ -1,0 +1,424 @@
+<div style="width: 100%;">
+	<div style="display: inline-block; margin-left: 38px;">
+		<h1 style="font-family: 'Poppins';">RATE SEARCH</h1>
+	</div>
+	<div style="display: inline-block;">
+		<a href="#ex1" rel="modal:open"><i rel="modal:open" id="userProfile" style="margin-left: 1100px; display: inline;" class="fas fa-2x fa-user"></i></a>
+	</div>
+	<div style=" font-family: 'Poppins'; color: grey;" id="ex1" class="modal">
+	  <p style="color: black; font-family: 'Poppins';">Welcome, <%= @user_logged_in.name %>!</p>
+	  <br>
+	  Email : <%= @user_logged_in.email_id %><br>
+	  Aadhar Number : <%= @user_logged_in.aadhar_num %><br>
+	  Contact Number: <%= @user_logged_in.contact_num %><br><br>
+	  <%= link_to 'Log out', '/logout' %>
+	</div>
+</div>
+<center>
+</center>
+<script src="https://kit.fontawesome.com/9c893472b0.js"></script>
+<!-- Remember to include jQuery :) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+
+<!-- jQuery Modal -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+<p style="visibility: hidden;" id="total_load_cards" value=<%= @total_loads %>><%= @total_loads %></p>
+<form autocomplete="off" method="post" action="/rates">
+	<div style="font-family: Poppins; color: grey; margin-top: 30px; margin-left: 38px; display: inline-block;">
+		<!-- <label>Origin Port</label> -->
+		<div class="autocomplete" style="width:250px;">
+	    	<input id="originportid" type="text" name="originport" placeholder="Origin Port">
+	  	</div>
+  	</div>
+	<div style="font-family: Poppins; color: grey; margin-top: 30px; margin-left: 10px; display: inline-block;">
+		<!-- <label>Destination Port</label> -->
+		<div class="autocomplete" style="width:250px;">
+	    	<input id="destportid" type="text" name="destport" placeholder="Destination Port">
+	  	</div>
+	</div>
+	<div style="font-family: Poppins; color: grey; margin-top: 30px; margin-left: 10px; display: inline-block;">
+		<!-- <label>Container Type</label> -->
+		<input type="textbox" name="conttype" placeholder="Container Type">
+	</div>
+	<div style="font-family: Poppins; color: grey; margin-top: 30px; margin-top: 10px; margin-left: 10px; display: inline-block;">
+		<!-- <label>Commodity</label> -->
+		<input style="width: 220px;" type="textbox" name="commodity" placeholder="Commodity">
+	</div>
+	<div style="font-family: Poppins; color: grey; margin-top: 40px; margin-top: 10px; margin-left: 10px; display: inline-block;">
+		<label>Container Size</label>
+		<div class="styled-select slate">
+			<select name="contsize">
+				<option value="40HC">40HC</option>
+				<option value="40">40</option>
+				<option value="20HC">20HC</option>
+				<option value="20">20</option>
+			</select>
+		</div>
+	</div>
+	<div style="font-family: Poppins; color: grey; margin-top: 40px; margin-left: 10px; display: inline-block;">
+		<input id="submitBtn" type="submit" name="Submit">
+	</div>
+	<div style="width: 100%; margin-top: 20px; background-color: white;">
+		
+		<% @result.each_with_index do |res, i| %>
+			<div id=<%= "loadCard_" + i.to_s%> style="display: none; box-shadow: 10px 10px 5px grey; width: 95%; margin-left: 34px; margin-top: 20px; background-color: #F1F1F1;">
+					<div style="margin-bottom: 20px; position: relative; margin-left: 78px; margin-top: 20px; font-family: 'Poppins'; display: inline-block; color: grey;"><i class="fas fa-map-marker-alt"></i> ORIGIN
+					<div style="font-size: 13px; position: relative; font-family: 'Poppins'; color: black;"><%= @origin_name %></div>
+				</div>
+
+				<div style="margin-bottom: 20px; position: relative; margin-left: 78px; margin-top: 20px; font-family: 'Poppins'; display: inline-block; color: grey;"><i class="fas fa-map-marker-alt"></i> DESTINATION
+					<div style="font-size: 13px; position: relative; font-family: 'Poppins'; color: black;"><%= @destination_name %></div>
+				</div>
+
+				<div style="margin-bottom: 20px; position: relative; margin-left: 78px; margin-top: 20px; font-family: 'Poppins'; display: inline-block; color: grey;"><i class="fas fa-dollar-sign"></i> PRICE
+					<div style="font-size: 13px; position: relative; font-family: 'Poppins'; color: black;"><%= res['total_price'] %></div>
+				</div>
+
+				<div style="margin-bottom: 20px; position: relative; margin-left: 78px; margin-top: 20px; font-family: 'Poppins'; display: inline-block; color: grey;"><i class="far fa-clock"></i> STARTING DATE
+					<div style="font-size: 13px; position: relative; font-family: 'Poppins'; color: black;"><%= res['start'] %></div>
+				</div>
+
+				<div style="margin-bottom: 20px; position: relative; margin-left: 78px; margin-top: 20px; font-family: 'Poppins'; display: inline-block; color: grey;"><i class="far fa-clock"></i> ENDING DATE
+					<div style="font-size: 13px; position: relative; font-family: 'Poppins'; color: black;"><%= res['end'] %></div>
+				</div>
+
+				<div style="margin-bottom: 20px; position: relative; margin-left: 78px; margin-top: 20px; font-family: 'Poppins'; display: inline-block; color: grey;"><i class="fas fa-info-circle"></i>
+					 MORE INFO
+					 <div style="font-size: 13px; position: relative; font-family: 'Poppins'; color: black;">Click here</div>
+				</div>	
+			</div>
+		<% end %>
+	</div>
+</form>
+
+
+<center>
+	<div style="font-family: 'Poppins'; margin-top: 20px;" class="pagination">			
+		 <ul class="pagination">
+		  <% for ii in 1..@total_pages %>
+		  	<li value=<%= ii %>><%= ii %></li>
+		  <% end %>
+		</ul>
+	</div>
+</center>
+
+
+<link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+
+<style type="text/css">
+
+	ul.pagination {
+	    display: inline-block;
+	    padding: 0;
+	    margin: 0;
+	}
+
+	ul.pagination li {
+		display: inline;
+	    color: black;
+	    float: left;
+	    padding: 8px 16px;
+	    text-decoration: none;
+	    border: 1px solid grey;
+	}
+
+	ul.pagination li.active {
+	    background-color: dodgerblue;
+	    color: white;
+	}
+
+	ul.pagination li:hover:not(.active) {background-color: #ddd;}
+	
+	.fa, .fas {
+		color: dodgerblue;
+	}
+
+	.far {
+		color: green;
+	}
+	.styled-select {
+	   background: url(http://i62.tinypic.com/15xvbd5.png) no-repeat 96% 0;
+	   height: 29px;
+	   overflow: hidden;
+	   width: 162px;
+	}
+
+	.styled-select select {
+	   background: transparent;
+	   border: none;
+	   font-size: 14px;
+	   height: 29px;
+	   padding: 5px; /* If you add too much padding here, the options won't show in IE */
+	   width: 162px;
+	}
+
+	.styled-select.slate {
+	   /*background: url(http://i62.tinypic.com/2e3ybe1.jpg) no-repeat right center;*/
+	   height: 34px;
+	   width: 162px;
+	   display: inline;
+	}
+
+	.styled-select.slate select {
+	   border: 1px solid #ccc;
+	   font-size: 16px;
+	   height: 34px;
+	   width: 162px;
+	}
+
+	.dropbtn {
+	  position: relative;
+	  float: right;
+	  background-color: #4CAF50;
+	  color: white;
+	  padding: 16px;
+	  font-size: 16px;
+	  border: none;
+	}
+
+	.dropdown {
+	  position: relative;
+	  display: inline-block;
+	}
+
+	.dropdown-content {
+	  display: none;
+	  position: absolute;
+	  background-color: #f1f1f1;
+	  min-width: 160px;
+	  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	  z-index: 1;
+	}
+
+	.dropdown-content a {
+	  color: black;
+	  padding: 12px 16px;
+	  text-decoration: none;
+	  display: block;
+	}
+
+	.dropdown-content a:hover {background-color: #ddd;}
+
+	.dropdown:hover .dropdown-content {display: block;}
+
+	.dropdown:hover .dropbtn {background-color: #3e8e41;}
+
+	/* NEW CSS*/
+		* {
+	  box-sizing: border-box;
+	}
+
+	body {
+	  font: 16px Arial;  
+	}
+
+	.autocomplete {
+	  position: relative;
+	  display: inline-block;
+	}
+
+	input {
+	  border: 1px solid transparent;
+	  background-color: #f1f1f1;
+	  padding: 10px;
+	  font-size: 16px;
+	}
+
+	input[type=text] {
+	  background-color: #f1f1f1;
+	  width: 100%;
+	}
+
+	input[type=submit] {
+	  background-color: DodgerBlue;
+	  color: #fff;
+	  cursor: pointer;
+	}
+
+	.autocomplete-items {
+	  position: absolute;
+	  border-bottom: none;
+	  border-top: none;
+	  z-index: 99;
+	  top: 100%;
+	  left: 0;
+	  right: 0;
+	}
+
+	.autocomplete-items div {
+	  padding: 10px;
+	  cursor: pointer;
+	  background-color: #fff; 
+	  border-bottom: 1px solid #d4d4d4; 
+	}
+
+	.autocomplete-items div:hover {
+	  background-color: #e9e9e9; 
+	}
+
+	.autocomplete-active {
+	  background-color: DodgerBlue !important; 
+	  color: #ffffff; 
+	}
+
+	.pagination {
+	  display: inline-block;
+	}
+
+	.pagination a {
+	  color: black;
+	  float: left;
+	  padding: 8px 16px;
+	  text-decoration: none;
+	  transition: background-color .3s;
+	}
+
+	.pagination a.active {
+	  background-color: #4CAF50;
+	  color: white;
+	}
+
+	.pagination a:hover:not(.active) {background-color: #ddd;}
+</style>
+
+<script type="text/javascript">
+	var total_pages = 0;
+	var total_loads = 0;
+	$(document).ready(function() {
+		total_loads = $('#total_load_cards').attr("value");
+		total_pages = total_loads/10 + 1;
+
+    	$("li").click(function ()
+		{       
+			var a = $(this).attr("value");
+			$("li").attr("class", "abc");
+			$(this).attr("class", "active");
+			data(a);
+		});
+
+		function data(a)
+		{  
+			    var output = "";
+			    for(i=((a-1)*10);i<(a*10);i++)
+			    {
+			    	id = '#loadCard_' + i.toString();			 
+			        $(id).css("display", "block");
+			    }
+			    for(j=0; j<((a-1)*10); j++) {
+			    	id = '#loadCard_' + j.toString();
+			    	$(id).css("display", "none");
+			    }	
+			    for(j=(a*10); j<total_loads; j++) {
+			    	id = '#loadCard_' + j.toString();
+			    	$(id).css("display", "none");
+			    }	    
+		}
+	});
+
+	$(document).ready(function() {
+		for(i=0; i<10; i++) {
+			id = '#loadCard_' + i.toString();			 
+			$(id).css("display", "block");
+			$(id).parent().attr("class", "active");
+		}
+	})
+
+	$('ul.nav li.dropdown').hover(function() {
+	  $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeIn(500);
+	}, function() {
+	  $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeOut(500);
+	});
+
+	$('#originportid').keyup(function(){
+		autocomplete(document.getElementById("originportid"));
+	});
+	$('#destportid').keyup(function(){
+		autocomplete(document.getElementById("destportid"));
+	});
+
+
+
+	// NEW JS
+	function autocomplete(inp) {		
+	  var currentFocus;
+	  inp.addEventListener("input", function(e) {
+	      var a, b, i, val = this.value;
+	      closeAllLists();
+	      if (!val) { return false;}
+	      currentFocus = -1;
+	      a = document.createElement("DIV");
+	      a.setAttribute("id", this.id + "autocomplete-list");
+	      a.setAttribute("class", "autocomplete-items");	      
+	      a.setAttribute("style", "overflow:scroll; height:400px;")
+	      this.parentNode.appendChild(a);	        
+	      if (val.length > 5) {
+	        	$.ajax({
+					url: "/get_location_suggestions",
+				    dataType: "json",
+				    data: {
+				        alphabet: inp.value
+				    },
+				    success: function (data) 
+				    {
+				    	arra = data['matches']
+				    	for(i=0; i<arra.length; i++) {
+				    		console.log("i=" + i);
+				    		b = document.createElement("DIV");
+				    		disp_name = arra[i]['port_id'];
+				    		b.innerHTML = "<strong id='port_id_" + disp_name + "'>" + val + "</strong>" + disp_name.substr(val.length, disp_name.length);
+				    		b.innerHTML += "<input type='hidden' value='" + arra[i]['port_id'] + "'>";
+				    		b.addEventListener("click", function(e) {	              
+	              				inp.value = this.getElementsByTagName("input")[0].value;          
+	                			closeAllLists();
+	              			});	         		
+	              			a.appendChild(b);
+				    	}			        
+				    }				
+				});	          	    	              	         
+	        }
+	      
+	    });
+	  /*execute a function presses a key on the keyboard:*/
+	  inp.addEventListener("keydown", function(e) {
+	      var x = document.getElementById(this.id + "autocomplete-list");
+	      if (x) x = x.getElementsByTagName("div");
+	      if (e.keyCode == 40) {
+	        currentFocus++;
+	        addActive(x);
+	      } else if (e.keyCode == 38) {
+	        currentFocus--;
+	        addActive(x);
+	      } else if (e.keyCode == 13) {
+	        e.preventDefault();
+	        if (currentFocus > -1) {
+	          if (x) x[currentFocus].click();
+	        }
+	      }
+	  });
+  function addActive(x) {
+    if (!x) return false;
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+	    var x = document.getElementsByClassName("autocomplete-items");
+	    for (var i = 0; i < x.length; i++) {
+		      if (elmnt != x[i] && elmnt != inp) {
+		      x[i].parentNode.removeChild(x[i]);
+	    	}
+	  	}
+		}
+		/*execute a function when someone clicks in the document:*/
+		document.addEventListener("click", function (e) {
+		    closeAllLists(e.target);
+		});
+	}
+</script>

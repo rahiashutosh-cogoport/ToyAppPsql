@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  port_id: 
+  display_name: MyString
+  postal_code: 1
+  loc: 
+  country_code: MyString
+  name: MyString
+
+two:
+  port_id: 
+  display_name: MyString
+  postal_code: 1
+  loc: 
+  country_code: MyString
+  name: MyString
