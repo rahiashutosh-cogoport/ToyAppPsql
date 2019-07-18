@@ -62,40 +62,73 @@ class RatesController < ApplicationController
   	end  	
   end
 
+  # def get_load_rates  
+  # 	headers['Access-Control-Allow-Origin'] = 'http://localhost:3001'
+  #   headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
+  #   headers['Access-Control-Request-Method'] = '*'
+  #   headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  #   headers['Access-Control-Allow-Credentials'] = 'true'	
+  # 	result_hash = get_rates(params)
+  #  # 	result_hash.each do |r|
+	 # 	#    a=Organization.where(:organization_id => r['shipping_line_id'])[0].business_name
+	 #  # end	
+  # 	origin_and_destination_hash = get_origin_and_destination_names(params)
+  # 	@result = result_hash
+  # 	count=0
+  # 	company_names = []
+  # 	@result.each do |res|
+  # 	  	count=count+1	  	
+  # 	  	# business_name = Organization.where(:organization_id => res['shipping_line_id'])[0].business_name
+  # 	  	# company_names.push(business_name)
+  # 	end
+  # 	@total_loads = count
+  # 	@total_pages = @total_loads/10 + 1	  	
+  # 	@origin_name = origin_and_destination_hash[:origin]
+  # 	@destination_name = origin_and_destination_hash[:destination]
+  # 	@user_logged_in = User.where(:aadhar_num => $redis[cookies[:user_token]])[0]
+  # 	puts "RESULT: " + @result.to_s
+  # 	render :json => {
+  # 	  	:numLoads => @total_loads,
+  # 	  	:numPages => @total_pages,
+  # 	  	:loads => @result,
+  # 	  	:origin_name => @origin_name,
+  # 	  	:destination_name => @destination_name,
+  # 	  	:user => @user_logged_in,
+  # 	  	:company_names => company_names
+  # 	}
+  # end
+
   def get_load_rates  
-  	headers['Access-Control-Allow-Origin'] = 'http://localhost:3001'
+    headers['Access-Control-Allow-Origin'] = 'http://localhost:3001'
     headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
     headers['Access-Control-Request-Method'] = '*'
     headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-    headers['Access-Control-Allow-Credentials'] = 'true'	
-  	result_hash = get_rates(params)
- #  	result_hash.each do |r|
-	# 	a=Organization.where(:organization_id => r['shipping_line_id'])[0].business_name
-	# end	
-	origin_and_destination_hash = get_origin_and_destination_names(params)
-	@result = result_hash
-	count=0
-	company_names = []
-	@result.each do |res|
-	  	count=count+1	  	
-	  	business_name = Organization.where(:organization_id => res['shipping_line_id'])[0].business_name
-	  	company_names.push(business_name)
-	end
-	@total_loads = count
-	@total_pages = @total_loads/10 + 1	  	
-	@origin_name = origin_and_destination_hash[:origin]
-	@destination_name = origin_and_destination_hash[:destination]
-	@user_logged_in = User.where(:aadhar_num => $redis[cookies[:user_token]])[0]
-	puts "RESULT: " + @result.to_s
-	render :json => {
-	  	:numLoads => @total_loads,
-	  	:numPages => @total_pages,
-	  	:loads => @result,
-	  	:origin_name => @origin_name,
-	  	:destination_name => @destination_name,
-	  	:user => @user_logged_in,
-	  	:company_names => company_names
-	}
+    headers['Access-Control-Allow-Credentials'] = 'true'  
+    result_arr = get_rates(params)
+    origin_and_destination_hash = get_origin_and_destination_names(params)
+    @result = result_arr
+    count=0
+    company_names = []
+    @result.each do |res|
+        count=count+1     
+        business_name = Organization.where(:organization_id => res['shipping_line_id'])[0].business_name
+        company_names.push(business_name)
+    end
+    @total_loads = count
+    @total_pages = @total_loads/10 + 1      
+    @origin_name = origin_and_destination_hash[:origin]
+    @destination_name = origin_and_destination_hash[:destination]
+    @user_logged_in = User.where(:aadhar_num => $redis[cookies[:user_token]])[0]
+    puts "RESULT: " + @result.to_s
+    render :json => {
+        :numLoads => @total_loads,
+        :numPages => @total_pages,
+        :loads => @result,
+        :origin_name => @origin_name,
+        :destination_name => @destination_name,
+        :user => @user_logged_in,
+        :company_names => company_names
+    }
   end
 
   def get_shipping_line_name
@@ -153,8 +186,15 @@ class RatesController < ApplicationController
 	  :password => "cogoportreadtestdb",
 	  :database => "cogoport_rate_pg"
 	).connection
-	res = conn.execute("SELECT * FROM rate_detailed_fcl_freight_charges WHERE \"origin_port_id\" = '" + origin_port.port_id.to_s + "' AND \"destination_port_id\" = '" + dest_port.port_id.to_s + "' AND \"commodity\" = '" + params[:commodity].to_s + "' AND \"container_type\" = '" + params[:conttype] + "' AND \"container_size\" = '" + params[:contsize].to_s + "' ORDER BY \"total_price\" ASC")	
-	# res = conn.execute("SELECT AVG(\"total_price\") FROM rate_detailed_fcl_freight_charges WHERE \"origin_port_id\" = '" + origin_port.port_id.to_s + "' AND \"destination_port_id\" = '" + dest_port.port_id.to_s + "' AND \"commodity\" = '" + params[:commodity].to_s + "' AND \"container_type\" = '" + params[:conttype] + "' AND \"container_size\" = '" + params[:contsize].to_s + "' GROUP BY \"shipping_line_id\"")		
+  resp_arr = []
+	# res = conn.execute("SELECT * FROM rate_detailed_fcl_freight_charges WHERE \"origin_port_id\" = '" + origin_port.port_id.to_s + "' AND \"destination_port_id\" = '" + dest_port.port_id.to_s + "' AND \"commodity\" = '" + params[:commodity].to_s + "' AND \"container_type\" = '" + params[:conttype] + "' AND \"container_size\" = '" + params[:contsize].to_s + "' ORDER BY \"total_price\" ASC")	
+	res = conn.execute("SELECT DISTINCT(\"shipping_line_id\"), \"total_price\" FROM rate_detailed_fcl_freight_charges s JOIN (SELECT MIN(\"total_price\") AS tp, \"shipping_line_id\" AS sli FROM rate_detailed_fcl_freight_charges WHERE \"origin_port_id\" = '" + origin_port.port_id.to_s + "' AND \"destination_port_id\" = '" + dest_port.port_id.to_s + "' AND \"commodity\" = '" + params[:commodity].to_s + "' AND \"container_type\" = '" + params[:conttype] + "' AND \"container_size\" = '" + params[:contsize].to_s + "' GROUP BY \"shipping_line_id\") min ON s.total_price = min.tp AND s.shipping_line_id = min.sli ORDER BY \"total_price\" ASC")
+  res.each do |r|    
+    resp = conn.execute("SELECT * FROM rate_detailed_fcl_freight_charges WHERE \"shipping_line_id\"='" + r['shipping_line_id'].to_s + "' AND \"total_price\"='" + r['total_price'].to_s + "' AND \"origin_port_id\" = '" + origin_port.port_id.to_s + "' AND \"destination_port_id\" = '" + dest_port.port_id.to_s + "' AND \"commodity\" = '" + params[:commodity].to_s + "' AND \"container_type\" = '" + params[:conttype] + "' AND \"container_size\" = '" + params[:contsize].to_s + "' ORDER BY \"total_price\" ASC")
+    resp_arr << resp.to_a[0]
+  end
+
+  # res = conn.execute("SELECT MIN(\"total_price\"), \"shipping_line_id\" FROM rate_detailed_fcl_freight_charges WHERE \"origin_port_id\" = '" + origin_port.port_id.to_s + "' AND \"destination_port_id\" = '" + dest_port.port_id.to_s + "' AND \"commodity\" = '" + params[:commodity].to_s + "' AND \"container_type\" = '" + params[:conttype] + "' AND \"container_size\" = '" + params[:contsize].to_s + "' GROUP BY \"shipping_line_id\"")
 	conn.close
 	conn_new = ActiveRecord::Base.establish_connection(
 	  :adapter => "postgresql",
@@ -164,7 +204,8 @@ class RatesController < ApplicationController
 	  :host => "localhost",
 	  :port => 5432
  	).connection
-  	return res
+  	# return res
+    return resp_arr
   end
 
   def get_origin_and_destination_names(params)

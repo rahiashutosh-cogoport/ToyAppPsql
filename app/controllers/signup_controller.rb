@@ -1,4 +1,5 @@
 require 'securerandom'
+include SecureRandom
 $redis = Redis::Namespace.new("my_app", :redis => Redis.new)
 
 class SignupController < ApplicationController
@@ -8,10 +9,11 @@ class SignupController < ApplicationController
   end
 
   def commit_user
-    headers['Access-Control-Allow-Origin'] = '*'
+    headers['Access-Control-Allow-Origin'] = 'http://localhost:3001'
     headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
     headers['Access-Control-Request-Method'] = '*'
     headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    headers['Access-Control-Allow-Credentials'] = 'true'
   	hash_response = {}    
   	user = User.new(
   		:name => params[:user_name],
@@ -27,14 +29,16 @@ class SignupController < ApplicationController
   		hash_response[:errors] = user.errors.messages
   		render :json => hash_response.to_json
   	else
-      verification_token_user = SecureRandom.alphanumeric
+      #verification_token_user = SecureRandom.alphanumeric
+      verification_token_user = SecureRandom.hex(10)
       $redis[user.aadhar_num] = verification_token_user
       puts "ASSIGNING TOKEN" + verification_token_user.to_s + " TO AADHAR " + user.aadhar_num.to_s   
       UserMailer.welcome_email(user, verification_token_user).deliver_now
   		hash_response[:statusCode] = 200
   	  # render :json => hash_response.to_json
   		# redirect_to '/login'
-      redirect_to 'http://localhost:3001/index'
+      # redirect_to 'http://localhost:3001/index'
+      render :json => hash_response.to_json
   	end
   end
 

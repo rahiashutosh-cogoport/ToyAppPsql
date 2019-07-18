@@ -1,4 +1,5 @@
 require 'securerandom'
+include SecureRandom
 $redis = Redis::Namespace.new("my_app", :redis => Redis.new)
 
 class LoginController < ApplicationController
@@ -36,7 +37,8 @@ class LoginController < ApplicationController
   			user = User.where(:email_id => params[:email_id])[0]        
   			if user.present?          
   				if user.password == params[:password]        
-  					token_user = SecureRandom.alphanumeric
+  					#token_user = SecureRandom.alphanumeric
+            token_user = SecureRandom.hex(10)
             puts 'ASSIGNED TOKEN: ' +   token_user.to_s
   					cookies.permanent[:user_token] = token_user
   					$redis[token_user] =  user.aadhar_num
@@ -67,6 +69,11 @@ class LoginController < ApplicationController
   end
 
   def logout
+    headers['Access-Control-Allow-Origin'] = 'http://localhost:3001'
+    headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
+    headers['Access-Control-Request-Method'] = '*'
+    headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    headers['Access-Control-Allow-Credentials'] = 'true'
   	token = cookies[:user_token]
   	cookies.delete :user_token
   	$redis.del(token)
@@ -78,6 +85,11 @@ class LoginController < ApplicationController
   end
 
   def logged_in
+    headers['Access-Control-Allow-Origin'] = 'http://localhost:3001'
+    headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
+    headers['Access-Control-Request-Method'] = '*'
+    headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    headers['Access-Control-Allow-Credentials'] = 'true'
   	user_token = cookies[:user_token]
   	if $redis[user_token].present?
   		render :json => { 
